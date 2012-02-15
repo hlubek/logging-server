@@ -10,6 +10,7 @@ import (
 	"sort"
 	"json"
 	"regexp"
+	"time"
 
 	"github.com/wsxiaoys/colors"
 )
@@ -25,8 +26,10 @@ type MockMatcher struct {
 	Response MockResponse
 }
 type MockResponse struct {
+	StatusCode  int
 	ContentType string
 	Body        interface{}
+	Defer       int
 }
 
 func (m *MockMatcher) Matches(req *http.Request) bool {
@@ -42,6 +45,11 @@ func (m *MockMatcher) Matches(req *http.Request) bool {
 }
 
 func (m *MockMatcher) Write(w http.ResponseWriter, req *http.Request) {
+	// Defer processing of this request
+	if m.Response.Defer > 0 {
+		<-time.After(int64(m.Response.Defer) * 10e8)
+	}
+
 	var contentType string
 	if m.Response.ContentType != "" {
 		contentType = m.Response.ContentType
@@ -49,6 +57,9 @@ func (m *MockMatcher) Write(w http.ResponseWriter, req *http.Request) {
 		contentType = "application/json"
 	}
 	w.Header().Set("Content-Type", contentType)
+	if m.Response.StatusCode > 0 {
+		w.WriteHeader(m.Response.StatusCode)
+	}
 	buf, _ := json.Marshal(m.Response.Body)
 	w.Write(buf)
 }

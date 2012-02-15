@@ -1,8 +1,8 @@
 [{
-  "Method": "GET",
+  "Method": "POST",
   "Path": "^/service/test/confirm",
   "Response": {
-    "Status": 201,
+    "StatusCode": 201,
     "Body": true
   }
 }, {
@@ -10,5 +10,12 @@
   "Path": "^/service/test/(.*)/action",
   "Response": {
     "Body": {"value": "9999999", "arbitrary_json": ["1234"]}
+  }
+}, {
+  "Method": "GET",
+  "Path": "^/service/slow",
+  "Response": {
+    "Defer": 0,
+    "Body": true
   }
 }]
