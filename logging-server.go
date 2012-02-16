@@ -1,15 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
-	"log"
-	"http"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"sort"
-	"json"
+	"log"
+	"net/http"
 	"regexp"
+	"sort"
 	"time"
 
 	"github.com/wsxiaoys/colors"
@@ -29,7 +29,7 @@ type MockResponse struct {
 	StatusCode  int
 	ContentType string
 	Body        interface{}
-	Defer       int
+	Defer       string
 }
 
 func (m *MockMatcher) Matches(req *http.Request) bool {
@@ -46,8 +46,12 @@ func (m *MockMatcher) Matches(req *http.Request) bool {
 
 func (m *MockMatcher) Write(w http.ResponseWriter, req *http.Request) {
 	// Defer processing of this request
-	if m.Response.Defer > 0 {
-		<-time.After(int64(m.Response.Defer) * 10e8)
+	if m.Response.Defer != "" {
+		if dur, err := time.ParseDuration(m.Response.Defer); err != nil {
+			log.Printf("Error: Cannot parse duration '%s'", m.Response.Defer)
+		} else {
+			<-time.After(dur)
+		}
 	}
 
 	var contentType string
@@ -86,7 +90,7 @@ func LogRequest(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	log.Print(colors.Sprintf("@c%s @{!y}%s", req.Method, req.URL.RawPath))
+	log.Print(colors.Sprintf("@c%s @{!y}%s", req.Method, req.URL.RequestURI()))
 	if data != "" {
 		colors.Printf("  @bRequest@|%s\n", data)
 	}
@@ -104,7 +108,7 @@ func LogRequest(w http.ResponseWriter, req *http.Request) {
 
 		w.WriteHeader(http.StatusNotFound)
 		w.Header().Set("Content-Type", "text/html")
-		io.WriteString(w, "<html><body>Unmatched request, please configure a mock request for path " + req.URL.RawPath + " and method " + req.Method + "</body></html>\n")
+		io.WriteString(w, "<html><body>Unmatched request, please configure a mock request for path "+req.URL.RequestURI()+" and method "+req.Method+"</body></html>\n")
 	}
 }
 
