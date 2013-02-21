@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 
-	"./loggingserver"
+	"github.com/chlu/logging-server/loggingserver"
 )
 
 var port *int = flag.Int("port", 8080, "Listen on this port")
