@@ -15,7 +15,7 @@
   "Method": "GET",
   "Path": "^/service/slow",
   "Response": {
-    "Defer": 0,
+    "Defer": 10,
     "Body": true
   }
 }]

@@ -21,9 +21,10 @@ var mockConfig *MockConfig
 
 type MockConfig []MockMatcher
 type MockMatcher struct {
-	Method   string
-	Path     string
-	Response MockResponse
+	Method      string
+	Path        string
+	QueryString string
+	Response    MockResponse
 }
 type MockResponse struct {
 	StatusCode  int
@@ -33,15 +34,24 @@ type MockResponse struct {
 }
 
 func (m *MockMatcher) Matches(req *http.Request) bool {
-	if m.Method == req.Method {
-		if m.Path == req.URL.Path {
-			return true
-		}
-		if matches, _ := regexp.MatchString(m.Path, req.URL.Path); matches {
-			return true
+	if m.Method != req.Method {
+		// log.Printf("Method %s not matched", req.Method)
+		return false
+	}
+
+	if matches, _ := regexp.MatchString(m.Path, req.URL.Path); m.Path != req.URL.Path && !matches {
+		// log.Printf("Path %s not matched", req.URL.Path)
+		return false
+	}
+
+	if m.QueryString != "" {
+		if matches, _ := regexp.MatchString(m.QueryString, req.URL.RawQuery); m.QueryString != req.URL.RawQuery && !matches {
+			// log.Printf("QueryString %s not matched", req.URL.RawQuery)
+			return false
 		}
 	}
-	return false
+
+	return true
 }
 
 func (m *MockMatcher) Write(w http.ResponseWriter, req *http.Request) {
@@ -90,7 +100,7 @@ func LogRequest(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	log.Print(colors.Sprintf("@c%s @{!y}%s", req.Method, req.URL.RequestURI()))
+	log.Print(colors.Sprintf("@c%s @{!y}%s", req.Method, req.RequestURI))
 	if data != "" {
 		colors.Printf("  @bRequest@|%s\n", data)
 	}
@@ -108,12 +118,13 @@ func LogRequest(w http.ResponseWriter, req *http.Request) {
 
 		w.WriteHeader(http.StatusNotFound)
 		w.Header().Set("Content-Type", "text/html")
-		io.WriteString(w, "<html><body>Unmatched request, please configure a mock request for path "+req.URL.RequestURI()+" and method "+req.Method+"</body></html>\n")
+		io.WriteString(w, "<html><body>Unmatched request, please configure a mock request for path "+req.URL.Path+" and method "+req.Method+"</body></html>\n")
 	}
 }
 
 func findMatcher(req *http.Request) *MockMatcher {
 	for _, matcher := range *mockConfig {
+		// log.Printf("Try matcher %v", i)
 		if matcher.Matches(req) {
 			return &matcher
 		}
