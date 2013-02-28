@@ -68,6 +68,19 @@ var testScenarios = map[string]mockScenario{
 		"/?foo=wrong",
 		false,
 	},
+
+	"GET method matched": mockScenario{
+		MockMatcher{Method: "GET", Path: "/"},
+		"GET",
+		"/",
+		true,
+	},
+	"GET method not matched with POST": mockScenario{
+		MockMatcher{Method: "GET", Path: "/"},
+		"POST",
+		"/",
+		false,
+	},
 }
 
 func TestMatcherWithPath(t *testing.T) {

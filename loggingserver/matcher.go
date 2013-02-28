@@ -2,6 +2,7 @@ package loggingserver
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -22,12 +23,14 @@ type MockResponse struct {
 	StatusCode  int
 	ContentType string
 	Body        interface{}
-	Defer       string
+	Defer       interface{}
 }
 
 func (m *MockMatcher) Matches(req *http.Request) bool {
 	if m.Method != req.Method {
-		log.Printf("Method %s not matched", req.Method)
+		if DebugMatcher {
+			log.Printf("Method %s not matched", req.Method)
+		}
 		return false
 	}
 
@@ -70,9 +73,18 @@ func (m *MockMatcher) Matches(req *http.Request) bool {
 
 func (m *MockMatcher) Write(w http.ResponseWriter, req *http.Request) {
 	// Defer processing of this request
-	if m.Response.Defer != "" {
-		if dur, err := time.ParseDuration(m.Response.Defer); err != nil {
-			log.Printf("Error: Cannot parse duration '%s'", m.Response.Defer)
+	// TODO Parse duration after reading configuration
+	var durValue string
+	switch t := m.Response.Defer.(type) {
+	case float64:
+		durValue = fmt.Sprintf("%fs", t)
+	case string:
+		durValue = t
+	}
+	if durValue != "" {
+
+		if dur, err := time.ParseDuration(durValue); err != nil {
+			log.Printf("Error: Cannot parse duration \"%v\"", durValue)
 		} else {
 			<-time.After(dur)
 		}
