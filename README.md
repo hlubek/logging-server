@@ -60,5 +60,6 @@ Some ideas for improvement:
 * Support expressions in the response based on the request
 
 Code status
+-----------
 
 * [![Build Status](https://travis-ci.org/chlu/logging-server.png)](https://travis-ci.org/chlu/logging-server)
