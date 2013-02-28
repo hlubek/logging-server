@@ -100,8 +100,13 @@ func (m *MockMatcher) Write(w http.ResponseWriter, req *http.Request) {
 	if m.Response.StatusCode > 0 {
 		w.WriteHeader(m.Response.StatusCode)
 	}
-	buf, _ := json.Marshal(m.Response.Body)
-	w.Write(buf)
+	switch t := m.Response.Body.(type) {
+	case string:
+		fmt.Fprint(w, t)
+	default:
+		buf, _ := json.Marshal(m.Response.Body)
+		w.Write(buf)
+	}
 }
 
 func (m *MockMatcher) queryStringIsRegexp() bool {
