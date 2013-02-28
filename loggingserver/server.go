@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/wsxiaoys/colors"
+	"github.com/wsxiaoys/terminal/color"
 )
 
 type LoggingServer struct {
@@ -30,15 +30,15 @@ func (s *LoggingServer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	for key, _ := range req.Form {
 		data += "\n    "
 		if value := req.Form.Get(key); value != "" {
-			data += colors.Sprintf("@.%s@|@w = @|%s", key, value)
+			data += color.Sprintf("@.%s@|@w = @|%s", key, value)
 		} else {
-			data += colors.Sprintf("%s", key)
+			data += color.Sprintf("%s", key)
 		}
 	}
 
-	log.Print(colors.Sprintf("@c%s @{!y}%s", req.Method, req.RequestURI))
+	log.Print(color.Sprintf("@c%s @{!y}%s", req.Method, req.RequestURI))
 	if data != "" {
-		colors.Printf("  @bRequest@|%s\n", data)
+		color.Printf("  @bRequest@|%s\n", data)
 	}
 
 	// Find matcher
@@ -48,9 +48,9 @@ func (s *LoggingServer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		// TODO Better response logging
 		response := matcher.Response
 
-		colors.Printf("  @gResponse@|\n    %+v\n", response)
+		color.Printf("  @gResponse@|\n    %+v\n", response)
 	} else {
-		colors.Print("  @rUnmatched@|\n")
+		color.Print("  @rUnmatched@|\n")
 
 		w.WriteHeader(http.StatusNotFound)
 		w.Header().Set("Content-Type", "text/html")
