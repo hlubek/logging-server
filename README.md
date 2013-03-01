@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/[YOUR_GITHUB_USERNAME]/[YOUR_PROJECT_NAME].png)](https://travis-ci.org/[YOUR_GITHUB_USERNAME]/[YOUR_PROJECT_NAME])
-
-Logging server
+Logging server [![Build Status](https://travis-ci.org/chlu/logging-server.png)](https://travis-ci.org/chlu/logging-server) 
 ==============
 
 A logging server with simple mock handlers for quick HTTP API stubs, written in Google Go (golang).
@@ -58,8 +56,3 @@ Some ideas for improvement:
 
 * Implement handling binary data in response
 * Support expressions in the response based on the request
-
-Code status
------------
-
-* [![Build Status](https://travis-ci.org/chlu/logging-server.png)](https://travis-ci.org/chlu/logging-server)
