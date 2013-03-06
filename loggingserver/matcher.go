@@ -103,6 +103,8 @@ func (m *MockMatcher) Write(w http.ResponseWriter, req *http.Request) {
 	switch t := m.Response.Body.(type) {
 	case string:
 		fmt.Fprint(w, t)
+	case nil:
+		fmt.Fprint(w, "")
 	default:
 		buf, _ := json.Marshal(m.Response.Body)
 		w.Write(buf)

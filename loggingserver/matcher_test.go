@@ -13,77 +13,76 @@ type mockScenario struct {
 	expected      bool
 }
 
-var testScenarios = map[string]mockScenario{
-	"exact path matched": mockScenario{
-		MockMatcher{Method: "GET", Path: "/foo/bar"},
-		"GET",
-		"/foo/bar",
-		true,
-	},
-	"exact path not matched with suffix": mockScenario{
-		MockMatcher{Method: "GET", Path: "/foo/bar"},
-		"GET",
-		"/foo/bar/baz",
-		false,
-	},
-	"exact path not matched with prefix": mockScenario{
-		MockMatcher{Method: "GET", Path: "/foo/bar"},
-		"GET",
-		"/test/foo/bar",
-		false,
-	},
-	"exact regexp path matched": mockScenario{
-		MockMatcher{Method: "GET", Path: "^/foo$"},
-		"GET",
-		"/foo",
-		true,
-	},
-	"regexp path matched with suffix": mockScenario{
-		MockMatcher{Method: "GET", Path: "^/foo"},
-		"GET",
-		"/foo/bar/baz",
-		true,
-	},
-	"regexp path matched with pattern": mockScenario{
-		MockMatcher{Method: "GET", Path: "^/foo/(bar|baz)$"},
-		"GET",
-		"/foo/bar",
-		true,
-	},
-	"regexp path not matched with wrong pattern": mockScenario{
-		MockMatcher{Method: "GET", Path: "^/foo/(bar|baz)$"},
-		"GET",
-		"/foo/bad",
-		false,
-	},
-	"exact query string matched": mockScenario{
-		MockMatcher{Method: "GET", Path: "/", QueryString: "foo=bar"},
-		"GET",
-		"/?foo=bar",
-		true,
-	},
-	"exact query string not matched": mockScenario{
-		MockMatcher{Method: "GET", Path: "/", QueryString: "foo=bar"},
-		"GET",
-		"/?foo=wrong",
-		false,
-	},
-
-	"GET method matched": mockScenario{
-		MockMatcher{Method: "GET", Path: "/"},
-		"GET",
-		"/",
-		true,
-	},
-	"GET method not matched with POST": mockScenario{
-		MockMatcher{Method: "GET", Path: "/"},
-		"POST",
-		"/",
-		false,
-	},
-}
-
 func TestMatcherWithPath(t *testing.T) {
+	var testScenarios = map[string]mockScenario{
+		"exact path matched": mockScenario{
+			MockMatcher{Method: "GET", Path: "/foo/bar"},
+			"GET",
+			"/foo/bar",
+			true,
+		},
+		"exact path not matched with suffix": mockScenario{
+			MockMatcher{Method: "GET", Path: "/foo/bar"},
+			"GET",
+			"/foo/bar/baz",
+			false,
+		},
+		"exact path not matched with prefix": mockScenario{
+			MockMatcher{Method: "GET", Path: "/foo/bar"},
+			"GET",
+			"/test/foo/bar",
+			false,
+		},
+		"exact regexp path matched": mockScenario{
+			MockMatcher{Method: "GET", Path: "^/foo$"},
+			"GET",
+			"/foo",
+			true,
+		},
+		"regexp path matched with suffix": mockScenario{
+			MockMatcher{Method: "GET", Path: "^/foo"},
+			"GET",
+			"/foo/bar/baz",
+			true,
+		},
+		"regexp path matched with pattern": mockScenario{
+			MockMatcher{Method: "GET", Path: "^/foo/(bar|baz)$"},
+			"GET",
+			"/foo/bar",
+			true,
+		},
+		"regexp path not matched with wrong pattern": mockScenario{
+			MockMatcher{Method: "GET", Path: "^/foo/(bar|baz)$"},
+			"GET",
+			"/foo/bad",
+			false,
+		},
+		"exact query string matched": mockScenario{
+			MockMatcher{Method: "GET", Path: "/", QueryString: "foo=bar"},
+			"GET",
+			"/?foo=bar",
+			true,
+		},
+		"exact query string not matched": mockScenario{
+			MockMatcher{Method: "GET", Path: "/", QueryString: "foo=bar"},
+			"GET",
+			"/?foo=wrong",
+			false,
+		},
+
+		"GET method matched": mockScenario{
+			MockMatcher{Method: "GET", Path: "/"},
+			"GET",
+			"/",
+			true,
+		},
+		"GET method not matched with POST": mockScenario{
+			MockMatcher{Method: "GET", Path: "/"},
+			"POST",
+			"/",
+			false,
+		},
+	}
 	for title, scenario := range testScenarios {
 		r, _ := http.NewRequest(scenario.requestMethod, scenario.requestUrl, nil)
 
